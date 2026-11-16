@@ -33,9 +33,9 @@ variable "container_name" {
 }
 
 variable "replication_type" {
-  description = "Storage account replication. ZRS survives a zone outage; use LRS in regions without zone support."
+  description = "Storage account replication. GZRS replicates across zones in the primary region and asynchronously to its paired region, so the state survives a regional outage; use GRS in regions without zone support. ZRS and LRS keep every copy in one region."
   type        = string
-  default     = "ZRS"
+  default     = "GZRS"
 }
 
 variable "version_expiration_days" {
