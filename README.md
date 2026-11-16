@@ -31,6 +31,9 @@ What the storage gets:
   customization.
 - **TLS-only** (`https_traffic_only_enabled`, minimum TLS 1.2) and no
   public blob access.
+- **Geo-redundant storage** (GZRS by default) — copies across zones in
+  the primary region plus its paired region, so the state survives a
+  regional outage.
 - **Native state locking** — the `azurerm` backend takes a blob lease
   during operations; nothing to configure.
 - **`prevent_destroy`** — `tofu destroy` refuses to delete the storage
@@ -108,8 +111,14 @@ skim: `git log` the new commits after pulling.
   Contributor** role on the container; you can then set
   `shared_access_key_enabled = false` on the storage account as a local
   customization.
-- `replication_type` defaults to ZRS (survives a zone outage). Set it
-  to LRS in regions without availability zones.
+- `replication_type` defaults to GZRS: three copies across zones in
+  the primary region plus an asynchronous copy in its paired region, so
+  the state survives a regional outage. Set it to GRS in regions without
+  availability zones. ZRS and LRS keep every copy in one region, which
+  compliance scanners that require cross-region backups will flag.
+  Switching an existing account from ZRS to GZRS, or LRS to GRS, is an
+  in-place update. Other changes between zonal and non-zonal types (e.g.
+  LRS to GZRS) force a new account, which `prevent_destroy` blocks.
 - Storage account activity can be audited via Azure Monitor /
   diagnostic settings on the blob service — like the AWS template's
   access logging, the log destination (Log Analytics workspace) is an
